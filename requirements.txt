@@ -10,3 +10,4 @@ django-extra-views==0.16.0
 djangorestframework==3.16.1
 gunicorn==19.7.1
 django-storages==1.14.2
+whitenoise==6.11.0

@@ -62,6 +62,7 @@ MIDDLEWARE = [
     'apps.utils.middlewares.get_current_user.GetCurrentUserMiddleware',
 ]
 
+
 ROOT_URLCONF = 'project.urls'
 
 TEMPLATES = [
@@ -164,6 +165,11 @@ LOGIN_URL = '/authentication/signin/'
 # Check if AWS_STORAGE_BUCKET_NAME is defined
 
 USE_S3 = os.getenv('USE_S3', 'FALSE').upper() == 'TRUE'
+USE_WHITENOISE = os.getenv('USE_WHITENOISE', 'FALSE').upper() == 'TRUE'
+
+if USE_S3 and USE_WHITENOISE:
+    raise ValueError("Invalid configuration: USE_S3 and USE_WHITENOISE cannot both be TRUE.")
+
 if USE_S3:
     AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
     AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID') 
@@ -176,3 +182,9 @@ if USE_S3:
     MEDIAFILES_LOCATION = 'media'
     DEFAULT_FILE_STORAGE = 'apps.utils.storages.S3MediaStorage'
     COMPRESS_ENABLED = False
+
+if USE_WHITENOISE:
+    MIDDLEWARE += [
+        "whitenoise.middleware.WhiteNoiseMiddleware",
+    ]
+    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
