@@ -11,7 +11,10 @@ class AuthenticationRequiredMiddleware:
 
     def __call__(self, request):
         path = request.path_info.rstrip('/')  
-        
+    
+        if path.startswith(settings.STATIC_URL.rstrip('/')) or path.startswith(settings.MEDIA_URL.rstrip('/')):
+            return self.get_response(request)
+    
         if not path.startswith(settings.LOGIN_URL) and not self._is_public_route(path):
             if not request.user.is_authenticated:
                 return redirect(f'{settings.LOGIN_URL}?next={request.path_info}')
