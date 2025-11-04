@@ -1,8 +1,10 @@
 {% block content %}
 {% if fields and fields.0.name != "TOTAL_FORMS" %}
+<div class="mb-4">
+  {{ errors }}
+</div>
 <div class="{% if '__prefix__' in form.prefix %}form-template{% else %}form-group{% endif %} {% if form.css_classes %}{{ form.css_classes }} {% else %}grid gap-6 mb-6 md:grid-cols-2{% endif %}" style="{% if '__prefix__' in form.prefix %}display: none;{% endif %}">
 {% endif %}
-  {{ errors }}
 
   {% block fields %}  
   {% for field in form %}

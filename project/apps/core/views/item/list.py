@@ -5,13 +5,13 @@ from apps.core.services.stock_service import StockService
 
 class ItemListView(BaseItemView, BaseListView):
     list_display = [
-        "id",
+        "code",
         "name",
         "unit_of_measure",
         "sale_price",
         "quantity",
     ]
-    search_fields = ["id", "name", "unit_of_measure", "sale_price"]
+    search_fields = ["code", "name", "unit_of_measure", "sale_price"]
 
     def get_objects_with_values(self, object_list):
         context_data = super().get_objects_with_values(object_list)

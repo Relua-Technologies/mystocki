@@ -39,7 +39,10 @@ class Item(BaseModel):
         ("cx", "Cx"),
         ("pc", "Pc"),
     ]
-
+    code = models.CharField(
+        max_length=50,
+        verbose_name="Código",
+    )
     stock = models.ForeignKey(
         "Stock",
         on_delete=models.CASCADE,
@@ -67,6 +70,12 @@ class Item(BaseModel):
         db_table = "item"
         verbose_name = "Item"
         verbose_name_plural = "Itens"
-
+        constraints = [
+            models.UniqueConstraint(
+                fields=["code", "stock"],
+                name="unique_code_per_company_stock"
+            )
+        ]
+        
     def __str__(self):
         return f"{self.name} ({self.get_unit_of_measure_display()})"

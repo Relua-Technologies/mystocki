@@ -7,6 +7,7 @@ class ItemForm(BaseModelForm):
     class Meta:
         model = Item
         fields = [
+            "code",
             "name",
             "unit_of_measure",
             "sale_price",
