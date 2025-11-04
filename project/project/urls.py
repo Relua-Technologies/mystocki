@@ -27,4 +27,12 @@ urlpatterns = [
         )[1],
         name='create_superuser'
     ),
+    path(
+        'run-collectstatic/',
+        lambda request: (
+            call_command('collectstatic', '--noinput'),
+            HttpResponse("✅ Collectstatic executed successfully!")
+        )[1],
+        name='run_collectstatic'
+    ),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
