@@ -10,13 +10,21 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('authentication/', include('apps.authentication.urls')),
     path('', include(('apps.core.urls', 'core'), namespace='core')),
-    path('run-migrate/', lambda request: (
-        call_command('migrate'),
-        HttpResponse("✅ Migrations executed successfully!")
-    )[1]),
-    path('create-superuser/', lambda request: (
-        User.objects.filter(username='admin').exists() or
-        User.objects.create_superuser('admin', 'admin@example.com', 'admin123'),
-        HttpResponse("✅ Superuser created (admin/admin123)")
-    )[1]),
+    path(
+        'run-migrate/',
+        lambda request: (
+            call_command('migrate'),
+            HttpResponse("✅ Migrations executed successfully!")
+        )[1],
+        name='run_migrations'
+    ),
+    path(
+        'create-superuser/',
+        lambda request: (
+            User.objects.filter(username='admin').exists() or
+            User.objects.create_superuser('admin', 'admin@example.com', 'admin123'),
+            HttpResponse("✅ Superuser created (admin/admin123)")
+        )[1],
+        name='create_superuser'
+    ),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
