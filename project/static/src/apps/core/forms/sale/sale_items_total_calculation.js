@@ -1,5 +1,6 @@
 $(window).on("load", function () {
   const FORMSET_PREFIX = "sale_items";
+  const $saleTotal = $("#id_total");
 
   function parseNumber(value) {
     const number = parseFloat(value);
@@ -10,11 +11,10 @@ $(window).on("load", function () {
     const quantity = parseNumber(row.find('input[name$="-quantity"]').val());
     const discount = parseNumber(row.find('input[name$="-discount"]').val());
     const price = parseNumber(row.find('input[name$="-price"]').val());
-
     let total = quantity * price * (1 - discount / 100);
     if (!Number.isFinite(total)) total = 0;
-
     row.find('input[name$="-total"]').val(total.toFixed(2));
+    updateSaleTotal();
   }
 
   function updatePriceFromSelect(row, select) {
@@ -22,6 +22,14 @@ $(window).on("load", function () {
     const price = parseNumber(selectedOption.data("price"));
     row.find('input[name$="-price"]').val(price.toFixed(2));
     updateTotal(row);
+  }
+
+  function updateSaleTotal() {
+    let total = 0;
+    $(`input[name^="${FORMSET_PREFIX}-"][name$="-total"]`).each(function () {
+      total += parseNumber($(this).val());
+    });
+    $saleTotal.val(total.toFixed(2));
   }
 
   $(document).on("change", `select[name^="${FORMSET_PREFIX}-"][name$="-item"]`, function () {
@@ -43,7 +51,6 @@ $(window).on("load", function () {
     $(`.dynamic-form`).each(function () {
       const row = $(this);
       const select = row.find(`select[name^="${FORMSET_PREFIX}-"][name$="-item"]`);
-
       if (select.length && select.val()) {
         updatePriceFromSelect(row, select);
       } else {
@@ -53,7 +60,6 @@ $(window).on("load", function () {
   }
 
   initializeExistingRows();
-
   setTimeout(initializeExistingRows, 300);
 
   $(document).on(`${FORMSET_PREFIX}:form-added`, function (_event, row) {
@@ -63,9 +69,10 @@ $(window).on("load", function () {
     } else {
       updateTotal(row);
     }
+    updateSaleTotal();
   });
 
-  $(document).on(`${FORMSET_PREFIX}:form-removed`, function (_event, row) {
-    updateTotal(row);
+  $(document).on(`${FORMSET_PREFIX}:form-removed`, function () {
+    updateSaleTotal();
   });
 });

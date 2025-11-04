@@ -56,11 +56,6 @@ class SaleItemModelForm(BaseModelForm):
     #     super().__init__(*args, **kwargs)
     #     self.fields["item"].queryset = Item.objects.in_stock()
 
-    class Media:
-        js = [
-            "src/apps/core/forms/formsets/sale_item/sale_items_total_calculation.js",
-        ]
-
     class Meta:
         model = SaleItem
         fields = ["item", "quantity", "discount", "price", "total"]

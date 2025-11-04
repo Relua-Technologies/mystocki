@@ -7,18 +7,36 @@ from apps.core.apps import APP_NAME
 
 
 class SaleForm(FormsetsInsideFormMixin, BaseModelForm):
-    # template_name = f"{APP_NAME}/sale/form_div.html"
-
+    total = forms.DecimalField(
+        label="Total",
+        required=False,
+        disabled=True,
+        decimal_places=2,
+        max_digits=10,
+        widget=forms.NumberInput(
+            attrs={
+                "class": "text-gray-700 bg-gray-100 border border-gray-300 rounded-md p-2",
+                "readonly": "readonly",
+            }
+        ),
+    )
     class Meta:
         model = Sale
         fields = [
             "customer_name",
             "date",
             "note",
+            "total",
         ]
         widgets = {
             "note": forms.Textarea(attrs={"rows": 1}),
         }
+
+    class Media:
+        js = [
+            "src/apps/core/forms/sale/sale_items_total_calculation.js",
+        ]
+
 
     def save_instance(self, commit=True, *args, **kwargs):
         instance = super().save_instance(commit=False, *args, **kwargs)
