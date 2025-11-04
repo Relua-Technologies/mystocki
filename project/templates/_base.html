@@ -403,6 +403,23 @@
       });
     });
   </script>
+  <script>
+    $(document).ready(function () {
+      $('[data-drawer-toggle]').on('click', function () {
+        const existingBackdrop = $('div[drawer-backdrop]');
+        if (existingBackdrop.length) {
+          existingBackdrop.remove();
+        }
+
+        setTimeout(function () {
+          const backdrops = $('div[drawer-backdrop]');
+          if (backdrops.length > 1) {
+            backdrops.slice(0, -1).remove();
+          }
+        }, 100);
+      });
+    });
+  </script>
   {% block extra_scripts %}
   {% endblock extra_scripts %}
   {% endblock scripts %}
