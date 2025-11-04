@@ -78,4 +78,4 @@ class Item(BaseModel):
         ]
         
     def __str__(self):
-        return f"{self.name} ({self.get_unit_of_measure_display()})"
+        return f"{self.name} ({self.code})"
