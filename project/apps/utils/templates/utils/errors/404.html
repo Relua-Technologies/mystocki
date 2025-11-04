@@ -1,0 +1,16 @@
+{% extends '_base.html' %}
+{% load compress %}
+{% load static %}
+
+{% block title%}Página Não Encontrada{% endblock title%}
+
+{% block body_content %}
+<div class="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6">
+    <div class="mx-auto max-w-screen-sm text-center">
+        <h1 class="mb-4 text-7xl tracking-tight font-extrabold lg:text-9xl text-primary-700 dark:text-primary-600">404</h1>
+        <p class="mb-4 text-3xl tracking-tight font-bold text-gray-900 md:text-4xl dark:text-white">Algo está faltando</p>
+        <p class="mb-4 text-lg font-light text-gray-500 dark:text-gray-400">Desculpe, não conseguimos encontrar essa página. Volte para a página inicial para continuar navegando pelo sistema.</p>
+        <a href="/" class="standard-btn my-4">Hub</a>
+    </div>   
+</div>
+{% endblock %}

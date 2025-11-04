@@ -1,0 +1,30 @@
+{% if widget.is_initial and not widget.required %}
+<input type="checkbox" name="{{ widget.checkbox_name }}" id="{{ widget.checkbox_id }}"{% if widget.attrs.disabled %} disabled{% endif %}>
+<label for="{{ widget.checkbox_id }}">{{ widget.clear_checkbox_label }}</label>
+{% endif %}
+
+{% with widget_class=widget.attrs.class|default:'' %}
+{% if widget.is_initial %}
+<div class="flex">
+{% if not 'aria-invalid' in widget.attrs %}
+{% include "django/forms/widgets/input.html" with class='input cursor-pointer !leading-4 !rounded-tr-none !rounded-br-none '|add:widget_class %}
+{% else %}
+{% include "django/forms/widgets/input.html" with class='input-error cursor-pointer !leading-4 !rounded-tr-none !rounded-br-none '|add:widget_class %}
+{% endif %}
+<a href="{{ widget.value.url }}" title="{{ widget.value }}" target="_blank" class="flex items-center justify-center text-white bg-gray-800 focus:ring-1 focus:ring-blue-500 focus:outline-none dark:focus:ring-blue-500 hover:bg-gray-700 dark:bg-gray-600 hover:dark:bg-gray-500 font-medium rounded-lg !rounded-tl-none !rounded-bl-none text-sm px-5">
+    <svg class="w-6 h-6 text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M6 16v-3h.375a.626.626 0 0 1 .625.626v1.749a.626.626 0 0 1-.626.625H6Zm6-2.5a.5.5 0 1 1 1 0v2a.5.5 0 0 1-1 0v-2Z"/>
+        <path fill-rule="evenodd" d="M11 7V2h7a2 2 0 0 1 2 2v5h1a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1h-1a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2H3a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1h6a2 2 0 0 0 2-2Zm7.683 6.006 1.335-.024-.037-2-1.327.024a2.647 2.647 0 0 0-2.636 2.647v1.706a2.647 2.647 0 0 0 2.647 2.647H20v-2h-1.335a.647.647 0 0 1-.647-.647v-1.706a.647.647 0 0 1 .647-.647h.018ZM5 11a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1h1.376A2.626 2.626 0 0 0 9 15.375v-1.75A2.626 2.626 0 0 0 6.375 11H5Zm7.5 0a2.5 2.5 0 0 0-2.5 2.5v2a2.5 2.5 0 0 0 5 0v-2a2.5 2.5 0 0 0-2.5-2.5Z" clip-rule="evenodd"/>
+        <path d="M9 7V2.221a2 2 0 0 0-.5.365L4.586 6.5a2 2 0 0 0-.365.5H9Z"/>
+    </svg>      
+</a>
+</div>
+{% else %}
+{% if not 'aria-invalid' in widget.attrs %}
+{% include "django/forms/widgets/input.html" with class='input cursor-pointer !leading-4'|add:widget_class %}
+{% else %}
+{% include "django/forms/widgets/input.html" with class='input-error cursor-pointer !leading-4'|add:widget_class %}
+{% endif %}
+{% endif %}
+{% endwith %}
+

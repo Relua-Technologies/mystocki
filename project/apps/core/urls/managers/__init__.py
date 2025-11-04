@@ -1,0 +1,1 @@
+from apps.core.urls.managers.app_url import AppURLManager

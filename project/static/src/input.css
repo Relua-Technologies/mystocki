@@ -1,0 +1,158 @@
+/* static/src/input.css */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* No seu input.css ou arquivo Tailwind */
+@layer utilities {
+    .toast-enter {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+    .toast-show {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    .toast-leave {
+        transform: translateY(100%);
+        opacity: 0;
+    }
+}
+
+/* Scrollbar Style */
+@layer utilities {
+
+    html::-webkit-scrollbar {
+        display: none;
+    }    
+    
+    :not(html):not(body)::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+    }
+    
+    :not(html):not(body)::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+    }
+
+    :not(html):not(body)::-webkit-scrollbar-thumb {
+        border-radius: 10px;
+    }
+
+    :not(html):not(body)::-webkit-scrollbar-thumb:hover {
+        background: rgba(0, 0, 0, 0.3);
+    }
+}
+
+/* Disabled */
+:disabled {
+    cursor: not-allowed;  
+    opacity: 0.5;        
+}
+
+
+/* Buttons */
+.standard-btn {
+    @apply text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800
+}
+
+.standard-btn:disabled {
+    @apply text-white bg-blue-400 dark:bg-blue-500 cursor-not-allowed
+}
+
+.standard-icon-btn {
+    @apply text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm w-auto px-1.5 py-1.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800
+}
+
+/* Select2 With Flowbite */
+.input:disabled {
+    @apply cursor-not-allowed opacity-50;
+}
+
+.input {
+    @apply block border w-full text-sm rounded-lg bg-gray-50 border-gray-300 text-gray-900 focus:ring-blue-500 dark:text-white dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400
+}
+
+.input-error {
+    @apply block border w-full text-sm rounded-lg bg-red-50 border-red-500 text-red-900 placeholder-red-700 focus:ring-red-500 focus:border-red-500 focus:outline-none dark:focus:ring-red-500 dark:focus:border-red-500 dark:bg-gray-700 dark:text-red-500 dark:placeholder-red-500 dark:border-red-500;
+}
+
+.select2-selection {
+    @apply !flex items-center justify-between cursor-pointer p-2 input;
+}
+
+.select2-container--default.select2-container--disabled .select2-selection--single {
+    @apply !cursor-not-allowed !opacity-50 !bg-fcfcfd dark:!bg-2b3544;
+}
+
+.select2-container--default .select2-selection--multiple {
+    @apply select2-selection;
+    padding: 0.4rem !important;
+}
+
+.select2-container--focus:not(.select2-container--disabled) .select2-selection {
+    @apply ring-1 ring-blue-500 border border-blue-500;
+}
+
+select.error + .select2-container .select2-selection {
+    @apply !ring-red-500 !border-red-500
+}
+
+select.error + .select2-container .select2-selection--multiple {
+    @apply !ring-red-500 !border-red-500
+}
+
+.select2-search__field {
+    @apply input dark:bg-gray-800;
+}
+
+.select2-container--open .select2-selection__arrow {
+    @apply rotate-180
+}
+
+.select2-dropdown--below {
+    @apply mt-2.5
+}
+
+.select2-dropdown {
+    @apply p-4 bg-white dark:bg-gray-700 mb-2.5 shadow-lg text-gray-900 text-sm rounded-lg block w-full dark:text-white
+}
+
+.select2-results__option {
+    @apply block flex-1 border-0 rounded-lg cursor-pointer text-gray-900 dark:text-white font-semibold text-sm mt-0.5 mb-0.5
+}
+
+.select2-results__option--highlighted {
+    @apply bg-gray-100 dark:bg-gray-600 block flex-1 border-0 rounded-lg 
+}
+
+.select2-results__option--selected {
+    @apply bg-blue-700 text-white dark:bg-blue-600 
+}
+
+.select2-selection__choice {
+    @apply input;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    @apply !pl-3;
+}
+
+.select2-container .select2-selection--multiple .select2-selection__rendered {
+    @apply !flex;
+}
+
+/* Remover as setas do campo number no Chrome/Safari */
+.input-number-no-spin::-webkit-outer-spin-button,
+.input-number-no-spin::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Remover as setas no Firefox */
+.input-number-no-spin {
+    -moz-appearance: textfield;
+}

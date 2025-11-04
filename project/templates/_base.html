@@ -1,0 +1,411 @@
+<!-- _base.html -->
+{% load compress %}
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title%}{{ title }}{% endblock title%}</title>
+  <script src="https://cdn.jsdelivr.net/npm/flowbite@2.4.1/dist/flowbite.min.js"></script>
+  <link rel="shortcut icon" href="{% static 'src/images/lizakids-logo.png' %}" type="image/x-icon">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.mask/1.14.16/jquery.mask.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/gh/tbasse/jquery-truncate@master/jquery.truncate.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+  <script type="text/javascript" src="{% static 'src/libraries/django-remote-form-helpers/jquery.remote.in.django.form.js' %}"></script>
+  <script type="text/javascript" src="{% static 'src/js/loading-spinner.js' %}"></script>
+  <script src="{% static 'src/js/input_masks_br.js' %}"></script>
+  <link rel="shortcut icon" href="{% static 'src/images/lizakids-logo.png' %}" type="image/x-icon">
+  <link rel="stylesheet" href="{% static 'src/css/style.css' %}">
+  {% compress css %}
+  <link rel="stylesheet" href="{% static 'output.css' %}">
+  {% endcompress %}
+  <script>
+    if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+  </script>
+  {% include 'base/includes/flowbite_select2_scripts.html' %}
+  {% block extra_head %}
+  {% endblock extra_head %}
+</head>
+
+<body class="bg-gray-50 dark:bg-gray-900">
+  {% include 'base/includes/loading-spinner.html' %}
+  {% block body_content %}
+  <nav class="fixed top-0 z-40 w-full bg-white border-b border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+    <div class="px-3 py-3 lg:px-5 lg:pl-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center justify-start">
+          {% if has_sidebar %}
+          <button data-drawer-target="drawer-navigation" data-drawer-toggle="drawer-navigation" aria-controls="drawer-navigation"
+            type="button"
+            class="inline-flex items-center p-2 mt-2 ms-3 text-sm text-gray-500 rounded-lg lg:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600">
+            <span class="sr-only">Open sidebar</span>
+            <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg">
+              <path clip-rule="evenodd" fill-rule="evenodd"
+                d="M2 4.75A.75.75 0 012.75 4h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 4.75zm0 10.5a.75.75 0 01.75-.75h7.5a.75.75 0 010 1.5h-7.5a.75.75 0 01-.75-.75zM2 10a.75.75 0 01.75-.75h14.5a.75.75 0 010 1.5H2.75A.75.75 0 012 10z">
+              </path>
+            </svg>
+          </button>
+          {% endif %}
+        
+          <a href="" class="flex items-center space-x-3 rtl:space-x-reverse">
+          <!--
+            <svg class="h-8 fill-current dark:fill-white gray-700" id="jcaworks-logo" xmlns="http://www.w3.org/2000/svg"
+              version="1.1" viewBox="0.00 0.00 427.00 206.00">
+              <path d="
+                M 39.50 197.43
+                Q 24.43 191.31 16.19 176.43
+                Q 12.40 169.58 11.54 162.52
+                C 11.46 161.84 10.85 161.40 10.85 160.69
+                Q 10.80 150.74 10.81 140.80
+                A 0.44 0.44 0.0 0 1 11.25 140.36
+                L 46.48 140.38
+                Q 47.82 140.38 47.77 141.72
+                C 47.55 147.52 47.16 155.60 51.55 160.04
+                Q 56.46 165.00 62.90 165.44
+                Q 73.25 166.13 92.47 165.72
+                Q 98.05 165.60 101.35 163.72
+                C 107.71 160.10 110.50 152.73 110.48 145.73
+                Q 110.38 107.47 110.39 67.29
+                Q 110.39 63.81 110.68 60.03
+                Q 110.98 56.11 111.78 53.00
+                Q 116.27 35.51 130.30 23.34
+                Q 139.65 15.24 151.34 12.20
+                Q 152.86 11.81 154.44 11.69
+                C 155.99 11.58 157.23 10.77 158.79 10.82
+                C 161.47 10.91 163.72 9.96 166.35 9.96
+                Q 221.83 9.96 276.98 9.96
+                Q 277.74 9.96 277.25 10.54
+                Q 264.99 24.96 254.48 39.10
+                C 252.79 41.36 250.70 43.38 248.66 45.36
+                A 1.43 1.41 23.0 0 1 247.68 45.75
+                C 224.70 45.74 201.68 46.03 178.71 45.76
+                C 170.85 45.67 161.38 46.60 155.70 51.75
+                Q 149.61 57.28 149.58 66.13
+                Q 149.45 104.05 149.53 142.76
+                C 149.54 147.64 149.07 152.81 148.42 157.73
+                Q 147.63 163.70 145.25 169.45
+                C 138.76 185.16 126.60 196.00 109.94 200.07
+                Q 103.33 201.69 92.85 201.60
+                Q 73.96 201.44 59.29 201.47
+                Q 49.50 201.49 39.50 197.43
+                Z" />
+              <path d="
+                M 369.50 165.50
+                L 283.75 165.50
+                Q 283.03 165.50 282.75 166.17
+                C 281.70 168.65 280.34 170.94 279.41 173.48
+                Q 274.36 187.24 268.67 200.82
+                A 1.14 1.13 11.2 0 1 267.62 201.52
+                Q 212.71 201.53 157.79 201.53
+                Q 156.66 201.53 155.52 201.39
+                A 0.26 0.26 0.0 0 1 155.37 200.95
+                Q 159.80 196.54 163.45 192.42
+                Q 175.01 179.38 185.19 167.55
+                A 3.75 3.73 -69.5 0 1 188.02 166.25
+                L 238.93 166.26
+                A 3.24 3.23 -78.6 0 0 241.91 164.27
+                L 305.34 11.75
+                A 2.89 2.67 -77.8 0 1 307.87 9.97
+                L 352.48 9.96
+                A 0.77 0.77 0.0 0 1 353.20 10.45
+                Q 367.07 45.53 380.77 83.02
+                Q 384.87 94.24 389.41 106.53
+                Q 397.31 127.93 405.23 149.17
+                Q 406.62 152.88 407.91 156.63
+                C 409.06 160.01 410.48 163.16 411.70 166.48
+                Q 418.13 184.00 423.91 200.64
+                Q 424.20 201.50 423.29 201.50
+                L 385.03 201.50
+                Q 383.82 201.50 383.36 200.38
+                Q 376.38 183.32 370.13 165.94
+                Q 369.97 165.50 369.50 165.50
+                Z
+                M 328.32 51.85
+                Q 327.54 52.65 327.09 53.61
+                C 323.51 61.22 320.56 69.70 317.31 77.78
+                Q 306.94 103.61 296.78 129.95
+                A 1.04 1.04 0.0 0 0 297.75 131.37
+                L 356.51 131.37
+                A 1.27 1.26 79.5 0 0 357.69 129.65
+                Q 342.83 91.47 331.00 58.15
+                Q 330.08 55.54 329.37 52.79
+                Q 329.22 52.19 328.67 51.81
+                A 0.27 0.27 0.0 0 0 328.32 51.85
+                Z" />
+            </svg>
+          -->
+          <img src="{% static 'src/images/lizakids-logo.png' %}" alt="Liza Kids Logo" class="h-8">
+          <span class="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">{{ request.user.company}}</span>
+          </a>
+        </div>
+        <div class="flex items-center">
+          <!-- Notifications -->
+          <button type="button" data-dropdown-toggle="notification-dropdown"
+            class="p-2 text-gray-500 rounded-lg hover:text-gray-900 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-700">
+            <span class="sr-only">View notifications</span>
+            <!-- Bell icon -->
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z">
+              </path>
+            </svg>
+          </button>
+          <!-- Dropdown menu -->
+          <div
+            class="z-20 z-50 hidden max-w-sm my-4 overflow-hidden text-base list-none bg-white divide-y divide-gray-100 rounded shadow-lg dark:divide-gray-600 dark:bg-gray-700"
+            id="notification-dropdown">
+            <div
+              class="block px-4 py-2 text-base font-medium text-center text-gray-700 bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+              Notifications
+            </div>
+            <div>
+              <!-- <a href="#" class="flex px-4 py-3 border-b hover:bg-gray-100 dark:hover:bg-gray-600 dark:border-gray-600">
+                <div class="flex-shrink-0">
+                  <img class="rounded-full w-11 h-11" src="/images/users/bonnie-green.png" alt="Jese image">
+                  <div
+                    class="absolute flex items-center justify-center w-5 h-5 ml-6 -mt-5 border border-white rounded-full bg-primary-700 dark:border-gray-700">
+                    <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        d="M8.707 7.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l2-2a1 1 0 00-1.414-1.414L11 7.586V3a1 1 0 10-2 0v4.586l-.293-.293z">
+                      </path>
+                      <path
+                        d="M3 5a2 2 0 012-2h1a1 1 0 010 2H5v7h2l1 2h4l1-2h2V5h-1a1 1 0 110-2h1a2 2 0 012 2v10a2 2 0 01-2 2H5a2 2 0 01-2-2V5z">
+                      </path>
+                    </svg>
+                  </div>
+                </div>
+                <div class="w-full pl-3">
+                  <div class="text-gray-500 font-normal text-sm mb-1.5 dark:text-gray-400">New message from <span
+                      class="font-semibold text-gray-900 dark:text-white">Bonnie Green</span>: "Hey, what's up? All set
+                    for the presentation?"</div>
+                  <div class="text-xs font-medium text-primary-700 dark:text-primary-400">a few moments ago</div>
+                </div>
+              </a>
+              <a href="#" class="flex px-4 py-3 border-b hover:bg-gray-100 dark:hover:bg-gray-600 dark:border-gray-600">
+                <div class="flex-shrink-0">
+                  <img class="rounded-full w-11 h-11" src="/images/users/jese-leos.png" alt="Jese image">
+                  <div
+                    class="absolute flex items-center justify-center w-5 h-5 ml-6 -mt-5 bg-gray-900 border border-white rounded-full dark:border-gray-700">
+                    <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6zM16 7a1 1 0 10-2 0v1h-1a1 1 0 100 2h1v1a1 1 0 102 0v-1h1a1 1 0 100-2h-1V7z">
+                      </path>
+                    </svg>
+                  </div>
+                </div>
+                <div class="w-full pl-3">
+                  <div class="text-gray-500 font-normal text-sm mb-1.5 dark:text-gray-400"><span
+                      class="font-semibold text-gray-900 dark:text-white">Jese leos</span> and <span
+                      class="font-medium text-gray-900 dark:text-white">5 others</span> started following you.</div>
+                  <div class="text-xs font-medium text-primary-700 dark:text-primary-400">10 minutes ago</div>
+                </div>
+              </a>
+              <a href="#" class="flex px-4 py-3 border-b hover:bg-gray-100 dark:hover:bg-gray-600 dark:border-gray-600">
+                <div class="flex-shrink-0">
+                  <img class="rounded-full w-11 h-11" src="/images/users/joseph-mcfall.png" alt="Joseph image">
+                  <div
+                    class="absolute flex items-center justify-center w-5 h-5 ml-6 -mt-5 bg-red-600 border border-white rounded-full dark:border-gray-700">
+                    <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd"
+                        d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                        clip-rule="evenodd"></path>
+                    </svg>
+                  </div>
+                </div>
+                <div class="w-full pl-3">
+                  <div class="text-gray-500 font-normal text-sm mb-1.5 dark:text-gray-400"><span
+                      class="font-semibold text-gray-900 dark:text-white">Joseph Mcfall</span> and <span
+                      class="font-medium text-gray-900 dark:text-white">141 others</span> love your story. See it and
+                    view more stories.</div>
+                  <div class="text-xs font-medium text-primary-700 dark:text-primary-400">44 minutes ago</div>
+                </div>
+              </a>
+              <a href="#" class="flex px-4 py-3 border-b hover:bg-gray-100 dark:hover:bg-gray-600 dark:border-gray-600">
+                <div class="flex-shrink-0">
+                  <img class="rounded-full w-11 h-11" src="/images/users/leslie-livingston.png" alt="Leslie image">
+                  <div
+                    class="absolute flex items-center justify-center w-5 h-5 ml-6 -mt-5 bg-green-400 border border-white rounded-full dark:border-gray-700">
+                    <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg">
+                      <path fill-rule="evenodd"
+                        d="M18 13V5a2 2 0 00-2-2H4a2 2 0 00-2 2v8a2 2 0 002 2h3l3 3 3-3h3a2 2 0 002-2zM5 7a1 1 0 011-1h8a1 1 0 110 2H6a1 1 0 01-1-1zm1 3a1 1 0 100 2h3a1 1 0 100-2H6z"
+                        clip-rule="evenodd"></path>
+                    </svg>
+                  </div>
+                </div>
+                <div class="w-full pl-3">
+                  <div class="text-gray-500 font-normal text-sm mb-1.5 dark:text-gray-400"><span
+                      class="font-semibold text-gray-900 dark:text-white">Leslie Livingston</span> mentioned you in a
+                    comment: <span class="font-medium text-primary-700 dark:text-primary-500">@bonnie.green</span> what
+                    do you say?</div>
+                  <div class="text-xs font-medium text-primary-700 dark:text-primary-400">1 hour ago</div>
+                </div>
+              </a>
+              <a href="#" class="flex px-4 py-3 hover:bg-gray-100 dark:hover:bg-gray-600">
+                <div class="flex-shrink-0">
+                  <img class="rounded-full w-11 h-11" src="/images/users/robert-brown.png" alt="Robert image">
+                  <div
+                    class="absolute flex items-center justify-center w-5 h-5 ml-6 -mt-5 bg-purple-500 border border-white rounded-full dark:border-gray-700">
+                    <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"
+                      xmlns="http://www.w3.org/2000/svg">
+                      <path
+                        d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z">
+                      </path>
+                    </svg>
+                  </div>
+                </div>
+                <div class="w-full pl-3">
+                  <div class="text-gray-500 font-normal text-sm mb-1.5 dark:text-gray-400"><span
+                      class="font-semibold text-gray-900 dark:text-white">Robert Brown</span> posted a new video:
+                    Glassmorphism - learn how to implement the new design trend.</div>
+                  <div class="text-xs font-medium text-primary-700 dark:text-primary-400">3 hours ago</div>
+                </div>
+              </a> -->
+            </div>
+            <a href="#"
+              class="block py-2 text-base font-normal text-center text-gray-900 bg-gray-50 hover:bg-gray-100 dark:bg-gray-700 dark:text-white dark:hover:underline">
+              <div class="inline-flex items-center ">
+                <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"></path>
+                  <path fill-rule="evenodd"
+                    d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                    clip-rule="evenodd"></path>
+                </svg>
+                View all
+              </div>
+            </a>
+          </div>
+          <button id="theme-toggle" type="button"
+            class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-none focus:ring-4 focus:ring-gray-200 dark:focus:ring-gray-700 rounded-lg text-sm p-2.5">
+            <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg">
+              <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+            </svg>
+            <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
+              xmlns="http://www.w3.org/2000/svg">
+              <path
+                d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z"
+                fill-rule="evenodd" clip-rule="evenodd"></path>
+            </svg>
+          </button>
+          <div id="tooltip-toggle" role="tooltip"
+            class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip">
+            Toggle dark mode
+          </div>
+          <!-- Profile -->
+          <div class="flex items-center ml-3">
+            <div>
+              <button type="button"
+                class="flex text-sm bg-gray-800 rounded-full focus:ring-4 focus:ring-gray-300 dark:focus:ring-gray-600"
+                id="user-menu-button-2" aria-expanded="false" data-dropdown-toggle="dropdown-2">
+                <span class="sr-only">Open user menu</span>
+                <img class="w-8 h-8 rounded-full" src="{% static 'src/images/default_profile_photo.png' %}" alt="user photo">
+              </button>
+            </div>
+            <!-- Dropdown menu -->
+            <div
+              class="z-50 hidden my-4 text-base list-none bg-white divide-y divide-gray-100 rounded shadow dark:bg-gray-700 dark:divide-gray-600"
+              id="dropdown-2">
+              <div class="px-4 py-3" role="none">
+                <p class="text-sm font-medium text-gray-900 truncate dark:text-gray-300" role="none">
+                  {{ request.user }}
+                </p>
+                <p class="text-sm font-medium text-gray-900 truncate dark:text-gray-300" role="none">
+                  {{ request.user.email }}
+                </p>
+              </div>
+              <ul class="py-1" role="none">
+                <li>
+                  <a href="#"
+                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
+                    role="menuitem">Configurações</a>
+                </li>
+                <li>
+                  <a href="{% url 'sign_out' %}"
+                    class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-600 dark:hover:text-white"
+                    role="menuitem">Sair</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  {% if has_sidebar %}
+  {% block sidebar %}
+  {% include '_sidebar.html' %}
+  {% endblock sidebar %}
+  {% endif %}
+
+  <div class="mx-auto px-4 mt-16 p-4 {% if has_sidebar %}lg:ml-64{% endif %}">
+    {% block content %}
+    {% endblock %}
+  </div>
+  {% endblock body_content %}
+  {% block scripts %}
+  <script>
+    var themeToggleDarkIcon = document.getElementById('theme-toggle-dark-icon');
+    var themeToggleLightIcon = document.getElementById('theme-toggle-light-icon');
+
+    if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      themeToggleLightIcon.classList.remove('hidden');
+    } else {
+      themeToggleDarkIcon.classList.remove('hidden');
+    }
+
+    var themeToggleBtn = document.getElementById('theme-toggle');
+
+    themeToggleBtn.addEventListener('click', function () {
+
+      themeToggleDarkIcon.classList.toggle('hidden');
+      themeToggleLightIcon.classList.toggle('hidden');
+
+      if (localStorage.getItem('color-theme')) {
+        if (localStorage.getItem('color-theme') === 'light') {
+          document.documentElement.classList.add('dark');
+          localStorage.setItem('color-theme', 'dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+          localStorage.setItem('color-theme', 'light');
+        }
+
+      } else {
+        if (document.documentElement.classList.contains('dark')) {
+          document.documentElement.classList.remove('dark');
+          localStorage.setItem('color-theme', 'light');
+        } else {
+          document.documentElement.classList.add('dark');
+          localStorage.setItem('color-theme', 'dark');
+        }
+      }
+
+    });
+
+  </script>
+  <script>
+    $(document).ready(function () {
+      $('[data-modal-toggle]').one('click', function () {
+        $('[modal-backdrop]:first').remove();
+      });
+    });
+  </script>
+  {% block extra_scripts %}
+  {% endblock extra_scripts %}
+  {% endblock scripts %}
+</body>
+
+</html>

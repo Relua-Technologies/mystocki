@@ -1,0 +1,7 @@
+{% if errors %}
+<ul class="{{ error_class }} mt-2 text-sm text-red-600 dark:text-red-500">
+    {% for error in errors %}
+    <li class="inline after:content-[','] last:after:content-['']">{{ error }}</li>
+    {% endfor %}</ul>
+</ul>
+{% endif %}

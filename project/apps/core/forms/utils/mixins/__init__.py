@@ -1,0 +1,1 @@
+from apps.core.forms.utils.mixins.asterisk_for_required_fields import AsteriskForRequiredFieldsFormMixin

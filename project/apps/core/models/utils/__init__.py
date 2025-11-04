@@ -1,0 +1,1 @@
+from apps.core.models.utils.base import BaseModel

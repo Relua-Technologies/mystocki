@@ -1,0 +1,1 @@
+from .authentication_required import AuthenticationRequiredMiddleware

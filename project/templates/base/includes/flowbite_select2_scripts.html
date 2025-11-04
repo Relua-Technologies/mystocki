@@ -1,0 +1,99 @@
+{% load static %}
+
+<link href="{% static 'src/libraries/select2/select2.min.css' %}" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.full.js"></script>
+<script>
+    class Select2Handler {
+        static applySelect2($context = $(document), selector = 'select:visible', options = { width: '100%' }) {
+            $context.find(selector).select2(options);
+            Select2Handler.setCustomArrow();
+        }
+
+        static setCustomArrow() {
+            $('.select2-container .select2-selection__arrow').html(`
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 stroke-gray-500" fill="none" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3.5" d="M19 9l-7 7-7-7" />
+            </svg>
+            `);
+        }
+
+        static destroy(selector = 'select:visible') {
+            $(selector).select2('destroy');
+        }
+
+        static refresh(selector = 'select:visible', options = { width: '100%' }) {
+            Select2Handler.destroy(selector);
+            Select2Handler.applySelect2(selector, options);
+        }
+    }
+</script>
+<script>
+    class DatePickerHandler {
+        dateFormat = 'DD/MM/YYYY'
+        locale = 'pt-br'
+
+        static applyDatePicker($context = $(document), selector = 'input[datepicker]') {
+            $context.find(selector).each(function () {
+                const $input = $(this);
+                const dateFormat = $input.attr('datepicker-format');
+                
+                if (!dateFormat) {
+                    dateFormat = DatePickerHandler.dateFormat;
+                }
+
+                new Datepicker($input[0], {
+                    format: dateFormat,
+                    locale: DatePickerHandler.locale
+                });
+            });
+        }
+    }
+</script>
+<script>
+    $(document).ready(function() {
+        Select2Handler.applySelect2();
+    });
+</script>
+<script>
+    class FormErrorHandler {
+        static showErrors(errors) {
+            $.each(errors, function(fieldId, errorMessages) {
+                const $field = $('#' + fieldId);  
+                const fieldTag = $field[0];  
+
+                if (fieldTag) {
+                    const message = errorMessages.join(', ');  
+                    fieldTag.setCustomValidity(message);  
+                    fieldTag.reportValidity();  
+
+                    $field.on('removed', function() {
+                        FormErrorHandler.clearFieldError(fieldTag);
+                    });
+
+                    $field.on('change', function() {
+                        FormErrorHandler.clearFieldError(fieldTag);
+                    });
+                }
+            });
+        }
+
+        static clearFieldError(fieldTag) {
+            fieldTag.setCustomValidity('');  
+            fieldTag.reportValidity();  
+        }
+    }
+</script>
+<!-- <script>
+    const errors = {};
+
+    {% for form in formset %}
+        {% for field in form %}
+            {% if field.errors %}
+                {% for error in field.errors %}
+                    errors["{{ field.id_for_label }}"] = errors["{{ field.id_for_label }}"] || [];
+                    errors["{{ field.id_for_label }}"].push("{{ error|escapejs }}");
+                {% endfor %}
+            {% endif %}
+        {% endfor %}
+    {% endfor %}
+</script> -->

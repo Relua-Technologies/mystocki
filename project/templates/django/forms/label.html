@@ -1,0 +1,1 @@
+{% if use_tag %}<{{ tag }}{% include 'django/forms/attrs.html' %} class="block mb-2 text-sm font-medium {% if field.errors %}text-red-700 dark:text-red-500{% else %}text-gray-900 dark:text-white{% endif%}" >{{ label }}</{{ tag }}>{% else %}{{ label }}{% endif %}

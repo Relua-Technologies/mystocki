@@ -1,0 +1,55 @@
+{% extends '_base_model.html' %}
+{% load compress %}
+{% load static %}
+
+{% block extra_head %}
+{% include 'base/includes/form_scripts.html' %}
+{% endblock extra_head %}
+
+{% block content %}
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div class="p-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 dark:bg-gray-800">
+        <div class="mb-4">
+            <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
+                {{ operation_mode }} de 
+                {% if verbose_name_shoube_be_plural or operation_mode == "Lista" %}
+                    {{ verbose_name_plural|default:model.verbose_name_plural }}
+                {% else %}
+                    {{ verbose_name|default:model.verbose_name }}*
+                {% endif %}
+            </h1>
+        </div>
+
+        {{ form }}
+    </div>
+
+    {% if form.formsets %}
+        {% for name, formset in form.formsets.items %}
+        <div id="{{ name }}-section" class="mt-4 p-4 bg-white border border-gray-200 rounded-lg shadow-sm 2xl:col-span-2 dark:border-gray-700 dark:bg-gray-800">
+            <div class="mb-4">
+                <h1 class="text-xl font-semibold text-gray-900 sm:text-2xl dark:text-white">
+                    {{ formset.verbose_title }}
+                </h1>
+            </div>
+            <div>
+                {{ formset }}
+            </div>
+        </div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="mb-4 mt-4 flex space-x-4 justify-end">
+        <button type="submit" class="standard-btn">
+            Salvar
+        </button>
+    </div>
+</form>
+{% endblock content %}
+
+{% block scripts %}
+{{ block.super }}
+{% block form_scripts %}
+{% endblock form_scripts %}
+{% endblock scripts %}

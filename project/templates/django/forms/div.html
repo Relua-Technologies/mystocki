@@ -1,0 +1,21 @@
+{% block content %}
+{% if fields and fields.0.name != "TOTAL_FORMS" %}
+<div class="{% if '__prefix__' in form.prefix %}form-template{% else %}form-group{% endif %} {% if form.css_classes %}{{ form.css_classes }} {% else %}grid gap-6 mb-6 md:grid-cols-2{% endif %}" style="{% if '__prefix__' in form.prefix %}display: none;{% endif %}">
+{% endif %}
+  {{ errors }}
+
+  {% block fields %}  
+  {% for field in form %}
+  {% if field.name != "DELETE" or '__prefix__' not in form.prefix %}
+  <div{% with classes=field.css_classes %} class="{% if classes %}{{ classes }} {% endif %}{% if field.is_hidden or field.name == 'DELETE' %}hidden {% endif %}"{% endwith %}>
+    {{ field.as_field_group }}
+  </div>
+  {% endif %}
+  {% endfor %}
+  {% endblock fields %}
+
+  {{ form.media }}
+{% if fields and fields.0.name != "TOTAL_FORMS" %}
+</div>
+{% endif %}
+{% endblock %}

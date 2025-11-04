@@ -1,0 +1,1 @@
+from apps.utils.views.errors.error_404 import Error404View
