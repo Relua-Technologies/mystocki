@@ -1,0 +1,71 @@
+name: Deploy to Production
+
+on:
+  push:
+    branches:
+      - 'release/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-22.04
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      with:
+        ref: ${{ github.ref }}
+
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: ${{ secrets.AWS_REGION }}
+
+    - name: Configure SSH access
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan ${{ secrets.EC2_PUBLIC_IP }} >> ~/.ssh/known_hosts
+
+    - name: Install Docker + Compose (Amazon Linux)
+      run: |
+        ssh ec2-user@${{ secrets.EC2_PUBLIC_IP }} "
+          sudo yum update -y &&
+          sudo yum install -y docker &&
+          sudo systemctl start docker &&
+          sudo systemctl enable docker &&
+          sudo usermod -aG docker ec2-user &&
+          sudo curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-linux-aarch64 -o /usr/local/bin/docker-compose &&
+          sudo chmod +x /usr/local/bin/docker-compose
+        "
+
+    - name: Clean previous deployment
+      run: |
+        ssh ec2-user@${{ secrets.EC2_PUBLIC_IP }} "
+          mkdir -p /home/ec2-user/mystocki &&
+          cd /home/ec2-user/mystocki &&
+          docker compose down || true &&
+          rm -rf /home/ec2-user/mystocki/*
+        "
+
+    - name: Upload project to EC2
+      run: |
+        scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r . ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/mystocki/
+
+    - name: Generate and upload .env
+      run: |
+        echo "" > .env
+        echo '${{ toJson(secrets) }}' | jq -r 'to_entries | map(select(.key != "SSH_PRIVATE_KEY" and .key != "github_token")) | .[] | "\(.key)=\(.value)"' >> .env
+        echo '${{ toJson(vars) }}' | jq -r 'to_entries | .[] | "\(.key)=\(.value)"' >> .env
+
+        scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa .env ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/mystocki/.env
+
+    - name: Start Docker Compose
+      run: |
+        ssh ec2-user@${{ secrets.EC2_PUBLIC_IP }} "
+          cd /home/ec2-user/mystocki &&
+          docker compose up -d --build
+        "
