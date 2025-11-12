@@ -97,6 +97,12 @@ jobs:
 
         scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa .env ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/mystocki/.env
 
+    - name: Ensure Docker network exists
+      run: |
+        ssh ec2-user@${{ secrets.EC2_PUBLIC_IP }} "
+          docker network inspect mystocki-network >/dev/null 2>&1 || docker network create mystocki-network
+        "
+
     - name: Start Docker Compose
       run: |
         ssh ec2-user@${{ secrets.EC2_PUBLIC_IP }} "
