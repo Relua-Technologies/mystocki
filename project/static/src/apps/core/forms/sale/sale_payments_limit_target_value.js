@@ -6,7 +6,6 @@ $(window).on("load", function () {
     return Number.isFinite(number) ? number : 0;
   }
 
-  // retorna TODAS as linhas do formset com base nos inputs target_value
   function getAllRows() {
     const rows = [];
     $(`input[name^="${FORMSET_PREFIX}-"][name$="-target_value"]`).each(function () {
@@ -42,7 +41,7 @@ $(window).on("load", function () {
     const current = parseNumber($target.val());
 
     $target.attr("max", maxAllowed);
-    $target.attr("placeholder", `Máx: ${maxAllowed.toFixed(2)}`);
+    $target.attr("placeholder", `Máx: ${maxAllowed.toFixed(2).replace('.', ',')}`);
 
     if (current > maxAllowed) {
       $target.val(maxAllowed.toFixed(2)).trigger("input");

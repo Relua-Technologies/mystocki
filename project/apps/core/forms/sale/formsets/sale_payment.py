@@ -3,13 +3,14 @@ from django.forms import inlineformset_factory
 from apps.core.models import Sale, SalePayment
 from apps.core.forms.utils.base import BaseModelForm
 from apps.core.formsets.base import BaseInlineFormSet
+from apps.utils.forms.mixins import AlwaysCreateIfNewFormMixin
 
 
-class SalePaymentModelForm(BaseModelForm):
+class SalePaymentModelForm(AlwaysCreateIfNewFormMixin, BaseModelForm):
     css_classes = 'grid gap-6 mb-6 md:grid-cols-6'
 
     payment_type = forms.ChoiceField(
-        choices=SalePayment.PAYMENT_TYPES,
+        choices=[("", "---------")] + SalePayment.PAYMENT_TYPES,
         label="Forma de Pagamento",
         widget=forms.Select(attrs={"class": "input"})
     )
