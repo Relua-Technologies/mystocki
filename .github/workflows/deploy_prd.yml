@@ -53,10 +53,12 @@ jobs:
 
     - name: Upload project to EC2
       run: |
+        echo "Creating temporary package directory..."
+        mkdir -p /tmp/package
         echo "Compressing project..."
-        tar -czf mystocki.tar.gz --exclude='.git' --exclude='.github' .
+        tar -czf /tmp/package/mystocki.tar.gz --exclude='.git' --exclude='.github' .
         echo "Uploading to EC2..."
-        scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa mystocki.tar.gz ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/
+        scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa /tmp/package/mystocki.tar.gz ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/
         echo "Extracting on EC2..."
         ssh ec2-user@${{ secrets.EC2_PUBLIC_IP }} "
           mkdir -p /home/ec2-user/mystocki &&
