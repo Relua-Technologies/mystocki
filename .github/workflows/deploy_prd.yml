@@ -33,13 +33,14 @@ jobs:
     - name: Install Docker + Compose (Amazon Linux)
       run: |
         ssh ec2-user@${{ secrets.EC2_PUBLIC_IP }} "
-          sudo yum update -y &&
-          sudo yum install -y docker curl &&
+          sudo yum clean all &&
+          sudo yum update -y --skip-broken &&
+          sudo yum install -y docker || true &&
           sudo systemctl start docker &&
           sudo systemctl enable docker &&
           sudo usermod -aG docker ec2-user &&
 
-          # Instalar Docker Compose com compatibilidade ARM (aarch64)
+          # Instalar Docker Compose sem reinstalar curl
           COMPOSE_VERSION=\$(curl -s https://api.github.com/repos/docker/compose/releases/latest | grep tag_name | cut -d '\"' -f4) &&
           sudo curl -L \"https://github.com/docker/compose/releases/download/\$COMPOSE_VERSION/docker-compose-linux-aarch64\" -o /usr/local/bin/docker-compose &&
           sudo chmod +x /usr/local/bin/docker-compose &&
