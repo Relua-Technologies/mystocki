@@ -48,16 +48,16 @@ jobs:
 
           # Instalar Buildx (última versão)
           BUILDX_VERSION=\$(curl -s https://api.github.com/repos/docker/buildx/releases/latest | grep tag_name | cut -d '\"' -f4) &&
-          sudo mkdir -p ~/.docker/cli-plugins &&
-          sudo curl -L \"https://github.com/docker/buildx/releases/download/\$BUILDX_VERSION/buildx-\$BUILDX_VERSION.linux-arm64\" -o /usr/libexec/docker/cli-plugins/docker-buildx &&
-          sudo chmod +x /usr/libexec/docker/cli-plugins/docker-buildx &&
+          sudo mkdir -p /root/.docker/cli-plugins &&
+          sudo curl -L \"https://github.com/docker/buildx/releases/download/\$BUILDX_VERSION/buildx-\$BUILDX_VERSION.linux-arm64\" -o /root/.docker/cli-plugins/docker-buildx &&
+          sudo chmod +x /root/.docker/cli-plugins/docker-buildx &&
+          sudo ln -sf /root/.docker/cli-plugins/docker-buildx /usr/libexec/docker/cli-plugins/docker-buildx &&
 
           # Confirmar versões
           docker --version &&
           docker-compose --version &&
           docker buildx version
         "
-
 
     - name: Clean previous deployment (safe - keep database data)
       run: |
