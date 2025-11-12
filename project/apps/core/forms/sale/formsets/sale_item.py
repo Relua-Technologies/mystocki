@@ -2,6 +2,7 @@ from django import forms
 from apps.core.models import Item, Sale, SaleItem
 from django.forms import inlineformset_factory, BaseInlineFormSet
 from apps.core.forms.utils.base import BaseModelForm
+from apps.core.formsets.base import BaseInlineFormSet
 from apps.core.services import StockService
 
 
@@ -70,6 +71,7 @@ SaleItemInlineFormset = inlineformset_factory(
     Sale,
     SaleItem,
     form=SaleItemModelForm,
+    formset=BaseInlineFormSet,
     extra=1,
 )
 
