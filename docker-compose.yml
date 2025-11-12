@@ -21,12 +21,12 @@ services:
     command: [
       "sh",
       "-c",
-      "python manage.py runserver ${PROJECT_NAME}.localhost:${PORT}"
+      "python manage.py runserver ${RUNSERVER_HOST:-${PROJECT_NAME}.localhost}:${PORT}"
     ]
     volumes:
       - ./project/:/usr/src/project
     ports:
-      - "${PORT}:${PORT}"
+      - "${EXTERNAL_PORT:-${PORT}}:${PORT}"
     environment:
       - PYTHONUNBUFFERED=True
       - OAUTHLIB_INSECURE_TRANSPORT=False

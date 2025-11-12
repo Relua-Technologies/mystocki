@@ -26,12 +26,12 @@ services:
       npm install && \
       pip install debugpy && \
       python -m debugpy --wait-for-client --listen 0.0.0.0:3000 \
-      manage.py runserver ${PROJECT_NAME}.localhost:${PORT}"
+      manage.py runserver ${RUNSERVER_HOST:-0.0.0.0}:${PORT}"
     ]
     volumes:
       - ./project/:/usr/src/project
     ports:
-      - "${PORT}:${PORT}"
+      - "${EXTERNAL_PORT:-${PORT}}:${PORT}"
       - "3000:3000"
     environment:
       - PYTHONUNBUFFERED=True
