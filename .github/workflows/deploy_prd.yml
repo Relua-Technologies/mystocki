@@ -48,21 +48,21 @@ jobs:
 
           # Instalar Buildx (última versão)
           BUILDX_VERSION=\$(curl -s https://api.github.com/repos/docker/buildx/releases/latest | grep tag_name | cut -d '\"' -f4) &&
-
-          # Cria diretórios compatíveis e instala em ambos
           sudo mkdir -p /usr/libexec/docker/cli-plugins &&
           sudo mkdir -p /usr/lib/docker/cli-plugins &&
-
           sudo curl -L \"https://github.com/docker/buildx/releases/download/\$BUILDX_VERSION/buildx-\$BUILDX_VERSION.linux-arm64\" -o /usr/libexec/docker/cli-plugins/docker-buildx &&
           sudo cp /usr/libexec/docker/cli-plugins/docker-buildx /usr/lib/docker/cli-plugins/docker-buildx &&
-
           sudo chmod +x /usr/libexec/docker/cli-plugins/docker-buildx &&
           sudo chmod +x /usr/lib/docker/cli-plugins/docker-buildx &&
+
+          # Corrigir permissões para o ec2-user (erro mkdir .docker/buildx)
+          sudo mkdir -p /home/ec2-user/.docker &&
+          sudo chown -R ec2-user:ec2-user /home/ec2-user/.docker &&
 
           # Confirmar versões
           docker --version &&
           docker-compose --version &&
-          docker buildx version
+          sudo -u ec2-user docker buildx version
         "
 
     - name: Clean previous deployment (safe - keep database data)
