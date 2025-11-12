@@ -71,7 +71,7 @@ jobs:
           mkdir -p /home/ec2-user/mystocki &&
           cd /home/ec2-user/mystocki &&
           docker compose down || true &&
-          find /home/ec2-user/mystocki -mindepth 1 -maxdepth 1 ! -name 'db_data' -exec rm -rf {} +
+          sudo find /home/ec2-user/mystocki -mindepth 1 -maxdepth 1 ! -name 'db_data' -exec rm -rf {} +
         "
 
     - name: Upload project to EC2
