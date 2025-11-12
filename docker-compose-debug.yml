@@ -21,12 +21,18 @@ services:
     command: [
       "sh",
       "-c",
-      "python manage.py runserver ${PROJECT_NAME}.localhost:${PORT}"
+      "curl -fsSL https://deb.nodesource.com/setup_21.x | bash - && \
+      apt-get install -y nodejs && \
+      npm install && \
+      pip install debugpy && \
+      python -m debugpy --wait-for-client --listen 0.0.0.0:3000 \
+      manage.py runserver ${PROJECT_NAME}.localhost:${PORT}"
     ]
     volumes:
       - ./project/:/usr/src/project
     ports:
       - "${PORT}:${PORT}"
+      - "3000:3000"
     environment:
       - PYTHONUNBUFFERED=True
       - OAUTHLIB_INSECURE_TRANSPORT=False

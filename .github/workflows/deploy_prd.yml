@@ -103,9 +103,16 @@ jobs:
           docker network inspect mystocki-network >/dev/null 2>&1 || docker network create mystocki-network
         "
 
+    - name: Force rebuild without cache
+      run: |
+        ssh ec2-user@${{ secrets.EC2_PUBLIC_IP }} "
+          cd /home/ec2-user/mystocki &&
+          docker-compose build --no-cache
+        "
+
     - name: Start Docker Compose
       run: |
         ssh ec2-user@${{ secrets.EC2_PUBLIC_IP }} "
           cd /home/ec2-user/mystocki &&
-          docker-compose up -d --build
+          docker-compose up -d 
         "
