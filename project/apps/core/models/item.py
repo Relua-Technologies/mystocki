@@ -4,28 +4,31 @@ from apps.utils.get_current_user import get_current_user
 
 
 class ItemManager(models.Manager):
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        user = get_current_user()
+        def get_queryset(self):
+            queryset = super().get_queryset()
+            user = get_current_user()
 
-        if user and getattr(user, "company_id", None):
-            return queryset.filter(stock__company_id=user.company_id)
+            if user and getattr(user, "company_id", None):
+                return queryset.filter(stock__company_id=user.company_id)
 
-        return queryset.none()
+            return queryset.none()
 
-    def in_stock(self):
-        from apps.core.services import StockService
+        def in_stock(self):
+            from apps.core.services import StockService
 
-        base_queryset = self.get_queryset()
-        items = list(base_queryset)
-        quantities = StockService.get_items_quantities(items)
+            base_queryset = self.get_queryset()
+            items = list(base_queryset)
+            quantities = StockService.get_items_quantities(items)
 
-        item_ids_in_stock = [
-            item.id for item in items if quantities.get(item.id, 0) > 0
-        ]
+            item_ids_in_stock = [
+                item.id for item in items if quantities.get(item.id, 0) > 0
+            ]
 
-        return base_queryset.filter(id__in=item_ids_in_stock)
+            return base_queryset.filter(id__in=item_ids_in_stock)
     
+        def with_sale_price(self):
+            return self.get_queryset().filter(sale_price__isnull=False, sale_price__gt=0)
+
 
 class Item(BaseModel):
     objects = ItemManager()

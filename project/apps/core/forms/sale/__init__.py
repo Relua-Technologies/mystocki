@@ -35,6 +35,8 @@ class SaleForm(FormsetsInsideFormMixin, BaseModelForm):
     class Media:
         js = [
             "src/apps/core/forms/sale/sale_items_total_calculation.js",
+            "src/apps/core/forms/sale/sale_items_limit_quantity.js",
+            "src/apps/core/forms/sale/sale_items_set_quantity_type.js",
         ]
 
 

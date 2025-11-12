@@ -6,6 +6,9 @@ up:
 down:
 	docker compose down
 
+debug:
+	docker compose -f docker-compose-debug.yml up
+
 logs:
 	make exec cmd="tail -f /var/log/* 2>/dev/null || true"
 

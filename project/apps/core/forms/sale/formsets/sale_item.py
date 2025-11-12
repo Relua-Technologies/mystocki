@@ -2,13 +2,17 @@ from django import forms
 from apps.core.models import Item, Sale, SaleItem
 from django.forms import inlineformset_factory, BaseInlineFormSet
 from apps.core.forms.utils.base import BaseModelForm
+from apps.core.services import StockService
 
 
 class ItemSelectWithPrice(forms.Select):
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
         option = super().create_option(name, value, label, selected, index, subindex=subindex, attrs=attrs)
         if value:  
-            option["attrs"]["data-price"] = float(value.instance.sale_price)
+            instance = value.instance
+            option["attrs"]["data-price"] = float(instance.sale_price)
+            option["attrs"]["data-quantity"] = StockService.get_item_quantity(instance)
+            option["attrs"]["data-unit"] = instance.unit_of_measure
         return option
 
 
@@ -43,7 +47,7 @@ class SaleItemModelForm(BaseModelForm):
     )
 
     item = forms.ModelChoiceField(
-        queryset=Item.objects.all(),
+        queryset=Item.objects.none(),
         widget=ItemSelectWithPrice(
             attrs={
                 "class": "input",
@@ -52,9 +56,9 @@ class SaleItemModelForm(BaseModelForm):
         label="Item",
     )
 
-    # def __init__(self, *args, **kwargs):
-    #     super().__init__(*args, **kwargs)
-    #     self.fields["item"].queryset = Item.objects.in_stock()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["item"].queryset = Item.objects.with_sale_price()
 
     class Meta:
         model = SaleItem
