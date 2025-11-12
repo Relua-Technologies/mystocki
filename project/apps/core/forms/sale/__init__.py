@@ -3,6 +3,7 @@ from django_formsets_inside_form import FormsetsInsideFormMixin
 from apps.core.forms.utils.base import BaseModelForm
 from apps.core.models import Sale
 from apps.core.forms.sale.formsets.sale_item import SaleItemInlineFormset
+from apps.core.forms.sale.formsets.sale_payment import SalePaymentInlineFormset
 from apps.core.apps import APP_NAME
 
 
@@ -37,6 +38,8 @@ class SaleForm(FormsetsInsideFormMixin, BaseModelForm):
             "src/apps/core/forms/sale/sale_items_total_calculation.js",
             "src/apps/core/forms/sale/sale_items_limit_quantity.js",
             "src/apps/core/forms/sale/sale_items_set_quantity_type.js",
+            "src/apps/core/forms/sale/sale_payments_auto_change.js",
+            "src/apps/core/forms/sale/sale_payments_limit_target_value.js",
         ]
 
 
@@ -64,6 +67,12 @@ class SaleForm(FormsetsInsideFormMixin, BaseModelForm):
                 files=self.files if self.is_bound else None,
                 instance=instance,
                 prefix="sale_items",
+            ),
+            "sale_payments": SalePaymentInlineFormset(
+                data=self.data if self.is_bound else None,
+                files=self.files if self.is_bound else None,
+                instance=instance,
+                prefix="sale_payments",
             ),
         }
         return formsets

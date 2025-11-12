@@ -21,7 +21,7 @@
         
         $formsetForms.formset({
             prefix: formsetPrefix,
-            formTemplate: '.form-template',
+            formTemplate: `#id_${formsetPrefix} .form-template`,
             addContainerClass: formsetAddContainerClass,
             added: function (row) {
                 $row = $(row);

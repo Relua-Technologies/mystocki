@@ -56,9 +56,6 @@ collectstatic:
 runserver:
 	make exec cmd="python manage.py runserver 0.0.0.0:8000"
 
-createsuperuser:
-	make exec cmd="python manage.py createsuperuser"
-
 compile:
 	make exec cmd="npx tailwindcss -i ./static/input.css -o ./static/output.css --watch"
 

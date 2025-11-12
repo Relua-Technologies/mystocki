@@ -7,5 +7,6 @@ class SaleListView(BaseSaleView, BaseListView):
         'id',
         'date',
         'customer_name',
+        'sold_by'
     ]
     search_fields = list_display

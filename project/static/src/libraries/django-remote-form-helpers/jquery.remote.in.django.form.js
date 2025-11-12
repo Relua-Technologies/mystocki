@@ -1,4 +1,4 @@
-m/*! Remote 1.0.0 - MIT license - Copyright 2024 Deivid Hugo */
+/*! Remote 1.0.0 - MIT license - Copyright 2024 Deivid Hugo */
 /*! Modified by Deivid Hugo to RemoteInDjangoForm */
 
 (function($) {

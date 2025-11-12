@@ -4,6 +4,7 @@ from django.forms import inlineformset_factory, BaseInlineFormSet
 from apps.core.forms.utils.base import BaseModelForm
 from apps.core.formsets.base import BaseInlineFormSet
 from apps.core.services import StockService
+from apps.utils.forms.mixins import AlwaysCreateIfNewFormMixin
 
 
 class ItemSelectWithPrice(forms.Select):
@@ -17,7 +18,7 @@ class ItemSelectWithPrice(forms.Select):
         return option
 
 
-class SaleItemModelForm(BaseModelForm):
+class SaleItemModelForm(AlwaysCreateIfNewFormMixin, BaseModelForm):
     css_classes = 'grid gap-6 mb-6 md:grid-cols-6'
 
     price = forms.DecimalField(
