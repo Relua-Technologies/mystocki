@@ -42,18 +42,27 @@ jobs:
           sudo chmod +x /usr/local/bin/docker-compose
         "
 
-    - name: Clean previous deployment
+    - name: Clean previous deployment (safe - keep database data)
       run: |
         ssh ec2-user@${{ secrets.EC2_PUBLIC_IP }} "
           mkdir -p /home/ec2-user/mystocki &&
           cd /home/ec2-user/mystocki &&
           docker compose down || true &&
-          rm -rf /home/ec2-user/mystocki/*
+          find /home/ec2-user/mystocki -mindepth 1 -maxdepth 1 ! -name 'db_data' -exec rm -rf {} +
         "
 
     - name: Upload project to EC2
       run: |
-        scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r . ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/mystocki/
+        echo "Compressing project..."
+        tar -czf mystocki.tar.gz --exclude='.git' --exclude='.github' .
+        echo "Uploading to EC2..."
+        scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa mystocki.tar.gz ec2-user@${{ secrets.EC2_PUBLIC_IP }}:/home/ec2-user/
+        echo "Extracting on EC2..."
+        ssh ec2-user@${{ secrets.EC2_PUBLIC_IP }} "
+          mkdir -p /home/ec2-user/mystocki &&
+          tar -xzf /home/ec2-user/mystocki.tar.gz -C /home/ec2-user/mystocki &&
+          rm /home/ec2-user/mystocki.tar.gz
+        "
 
     - name: Generate and upload .env
       run: |
