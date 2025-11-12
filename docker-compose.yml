@@ -9,6 +9,8 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     restart: always
+    volumes:
+      - mystocki_postgres_data:/var/lib/postgresql/data
     networks:
       - mystocki-network
 
@@ -41,3 +43,6 @@ services:
 networks:
     mystocki-network:
         external: true
+
+volumes:
+    mystocki_postgres_data:
