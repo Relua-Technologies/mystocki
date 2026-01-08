@@ -31,7 +31,6 @@ $(window).on("load", function () {
       }
     });
 
-    console.log(total)
     return Math.max(total - sumOthers, 0);
   }
 
@@ -66,7 +65,6 @@ $(window).on("load", function () {
 
   function observeAnyChange(input, callback) {
     // Usuário
-    input.addEventListener("input", callback);
     input.addEventListener("change", callback);
 
     // JS / jQuery
