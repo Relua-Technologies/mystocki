@@ -32,11 +32,15 @@ $(window).on("load", function () {
     $saleTotal.val(total.toFixed(2));
   }
 
-  function observeAnyChange(input, callback) {
-    // Usuário
+  function observeAnyChange(target, callback) {
+    if (target instanceof jQuery) {
+      target.change(callback); 
+      return;
+    }
+
+    const input = target;
     input.addEventListener("change", callback);
 
-    // JS / jQuery
     const desc = Object.getOwnPropertyDescriptor(
       HTMLInputElement.prototype,
       "value"
@@ -55,25 +59,22 @@ $(window).on("load", function () {
       }
     });
   }
-  
-  // Para cada select de item
-  $(`select[name^="${FORMSET_PREFIX}-"][name$="-item"]`).each(function () {
-    observeAnyChange(this, function () {
-      const $select = $(this);
-      const $row = $select.closest(".dynamic-form");
-      updatePriceFromSelect($row, $select);
-    });
+
+  const $selectItens = $(`select[name^="${FORMSET_PREFIX}-"][name$="-item"]`)
+  observeAnyChange($selectItens, function () {
+    const $select = $(this);
+    const $row = $select.closest(".dynamic-form");
+    updatePriceFromSelect($row, $select);
   });
 
-  // Para cada input de quantidade ou desconto
-  $(`input[name^="${FORMSET_PREFIX}-"][name$="-quantity"], 
-    input[name^="${FORMSET_PREFIX}-"][name$="-discount"]`).each(function () {
-    observeAnyChange(this, function () {
-      console.log('----', this.value)
-      const $input = $(this);
-      const $row = $input.closest(".dynamic-form");
-      updateTotal($row);
-    });
+  const $quantityAndDiscountInputs = $(`
+    input[name^="${FORMSET_PREFIX}-"][name$="-quantity"],
+    input[name^="${FORMSET_PREFIX}-"][name$="-discount"]
+  `);
+  observeAnyChange($quantityAndDiscountInputs, function () {
+    const $input = $(this);
+    const $row = $input.closest(".dynamic-form");
+    updateTotal($row);
   });
 
   function initializeExistingRows() {
