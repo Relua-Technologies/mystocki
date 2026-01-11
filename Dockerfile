@@ -8,4 +8,15 @@ RUN pip install -r requirements.txt
 
 ADD ./project /project
 
-CMD gunicorn --bind 0.0.0.0:8000 project.wsgi:application
+CMD gunicorn \
+  --bind 0.0.0.0:8000 \
+  --workers 5 \
+  --threads 2 \
+  --worker-class gthread \
+  --timeout 60 \
+  --graceful-timeout 30 \
+  --keep-alive 5 \
+  --access-logfile - \
+  --error-logfile - \
+  --log-level info \
+  project.wsgi:application
