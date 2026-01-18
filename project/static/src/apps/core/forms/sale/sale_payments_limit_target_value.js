@@ -31,7 +31,6 @@ $(window).on("load", function () {
       }
     });
 
-    console.log(total)
     return Math.max(total - sumOthers, 0);
   }
 
@@ -63,6 +62,46 @@ $(window).on("load", function () {
       if (row[0] !== exceptRow[0]) updateTargetValueLimit(row);
     });
   }
+
+  function observeAnyChange(input, callback) {
+    // Usuário
+    input.addEventListener("change", callback);
+
+    // JS / jQuery
+    const desc = Object.getOwnPropertyDescriptor(
+      HTMLInputElement.prototype,
+      "value"
+    );
+
+    if (!desc || !desc.set) return;
+
+    Object.defineProperty(input, "value", {
+      configurable: true,
+      get() {
+        return desc.get.call(this);
+      },
+      set(v) {
+        desc.set.call(this, v);
+        callback();
+      }
+    });
+  }
+
+  function recalculateAllPaymentLimits(changedRow) {
+    getAllRows().forEach(function (row) {
+      updateTargetValueLimit(row);
+      updateChange(row);
+    });
+  }
+
+  const totalInput = document.getElementById("id_total");
+
+  if (totalInput) {
+    observeAnyChange(totalInput, function () {
+      recalculateAllPaymentLimits();
+    });
+  }
+
 
   // listeners
   $(document).on(
