@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta, time as dt_time
 from calendar import monthrange
-from django.db.models import Sum, F, Q, Count, Avg
+from django.db.models import Sum, F, Count
 from django.utils import timezone
 from django.db.models.functions import TruncDate, TruncDay, TruncWeek, TruncMonth, TruncYear
 from apps.core.models import Sale, SaleItem, StockMovement
@@ -88,6 +88,8 @@ class DateFormatter:
     
     @staticmethod
     def format_week_label(week_start_date):
+        if not week_start_date:
+            return ''
         week_end_date = week_start_date + timedelta(days=6)
         start_str = week_start_date.strftime('%d/%m')
         end_str = week_end_date.strftime('%d/%m')
@@ -118,7 +120,7 @@ class CostCalculator:
                 total_purchase_price__isnull=False,
                 total_purchase_price__gt=0,
                 created__lte=date_limit_datetime
-            ).order_by('-created_at')
+            ).order_by('-created')
             
             if not movements.exists():
                 return 0.0
@@ -238,8 +240,6 @@ class SoldItemsCostCalculator:
                     if item_cost and item_cost > 0:
                         items_with_cost += 1
                         total_cost += float(item_cost) * sale_quantity
-                    else:
-                        total_cost += 0.0
             
             is_reliable = (total_items > 0 and 
                           items_with_cost == total_items and 
@@ -329,41 +329,60 @@ class ChartDataCalculator:
     @staticmethod
     def format_label(sale_data, trunc_field, date_format):
         if trunc_field == 'day':
-            date_obj = sale_data['day']
+            date_obj = sale_data.get('day')
+            if not date_obj:
+                return ''
             return DateFormatter.format_day_label(date_obj)
         
         elif trunc_field == 'week':
-            week_start = sale_data['week']
+            week_start = sale_data.get('week')
+            if not week_start:
+                return ''
             return DateFormatter.format_week_label(week_start)
         
         elif trunc_field == 'month':
-            date_obj = sale_data['month']
+            date_obj = sale_data.get('month')
+            if not date_obj:
+                return ''
             return DateFormatter.format_month_label(date_obj)
         
         elif trunc_field == 'year':
-            year = sale_data['year'].year
-            return DateFormatter.format_year_label(year)
+            year_obj = sale_data.get('year')
+            if not year_obj:
+                return ''
+            return DateFormatter.format_year_label(year_obj.year)
         
         return ''
     
     @staticmethod
     def filter_sales_by_period(sales, sale_data, trunc_field):
         if trunc_field == 'day':
-            return sales.filter(date=sale_data['day'])
+            day = sale_data.get('day')
+            if not day:
+                return sales.none()
+            return sales.filter(date=day)
         
         elif trunc_field == 'week':
-            week_start = sale_data['week']
+            week_start = sale_data.get('week')
+            if not week_start:
+                return sales.none()
             week_end = week_start + timedelta(days=6)
             return sales.filter(date__gte=week_start, date__lte=week_end)
         
         elif trunc_field == 'month':
+            month = sale_data.get('month')
+            if not month:
+                return sales.none()
             return sales.filter(
-                date__year=sale_data['month'].year,
-                date__month=sale_data['month'].month
+                date__year=month.year,
+                date__month=month.month
             )
         
         elif trunc_field == 'year':
-            return sales.filter(date__year=sale_data['year'].year)
+            year = sale_data.get('year')
+            if not year:
+                return sales.none()
+            return sales.filter(date__year=year.year)
         
         return sales.none()
     
@@ -396,20 +415,31 @@ class ChartDataCalculator:
     @staticmethod
     def _calculate_costs(sale_data, trunc_field):
         if trunc_field == 'day':
-            start_date = sale_data['day']
-            end_date = sale_data['day']
+            day = sale_data.get('day')
+            if not day:
+                return 0.0
+            start_date = day
+            end_date = day
         elif trunc_field == 'week':
-            week_start = sale_data['week']
+            week_start = sale_data.get('week')
+            if not week_start:
+                return 0.0
             week_end = week_start + timedelta(days=6)
             start_date = week_start
             end_date = week_end
         elif trunc_field == 'month':
-            start_date = sale_data['month'].replace(day=1)
-            last_day = monthrange(sale_data['month'].year, sale_data['month'].month)[1]
-            end_date = sale_data['month'].replace(day=last_day)
+            month = sale_data.get('month')
+            if not month:
+                return 0.0
+            start_date = month.replace(day=1)
+            last_day = monthrange(month.year, month.month)[1]
+            end_date = month.replace(day=last_day)
         elif trunc_field == 'year':
-            start_date = sale_data['year'].replace(month=1, day=1)
-            end_date = sale_data['year'].replace(month=12, day=31)
+            year = sale_data.get('year')
+            if not year:
+                return 0.0
+            start_date = year.replace(month=1, day=1)
+            end_date = year.replace(month=12, day=31)
         else:
             return 0.0
         
@@ -566,7 +596,6 @@ class SaleService:
         
         labels = []
         values = []
-        sales = Sale.objects.all()
         
         for sale_data in period_sales:
             if trunc_field in sale_data and sale_data[trunc_field]:
@@ -574,7 +603,7 @@ class SaleService:
                 labels.append(label)
                 
                 period_sales_filtered = ChartDataCalculator.filter_sales_by_period(
-                    sales, sale_data, trunc_field
+                    Sale.objects.all(), sale_data, trunc_field
                 )
                 
                 value = ChartDataCalculator.calculate_chart_value(
