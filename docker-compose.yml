@@ -1,7 +1,7 @@
 services:
-  mystocki-database: 
-    image: postgres:16
-    container_name: mystocki-database 
+  mystocki-database:
+    image: postgres:18.1
+    container_name: mystocki-database
     ports:
       - "5432:${DB_PORT}"
     environment:
@@ -10,7 +10,13 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     restart: always
     volumes:
-      - mystocki_postgres_data:/var/lib/postgresql/data
+      - mystocki_postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
     networks:
       - mystocki-network
 
@@ -20,11 +26,8 @@ services:
       context: .
       dockerfile: Dockerfile
     working_dir: /usr/src/project
-    command: [
-      "sh",
-      "-c",
-      "python manage.py runserver ${RUNSERVER_HOST:-${PROJECT_NAME}.localhost}:${PORT}"
-    ]
+    command: >
+      sh -c "python manage.py runserver ${RUNSERVER_HOST:-${PROJECT_NAME}.localhost}:${PORT}"
     volumes:
       - ./project/:/usr/src/project
     ports:
@@ -34,15 +37,16 @@ services:
       - OAUTHLIB_INSECURE_TRANSPORT=False
       - DEBUG=true
     env_file:
-      .env
+      - .env
     depends_on:
-      - mystocki-database
+      mystocki-database:
+        condition: service_healthy
     networks:
       - mystocki-network
 
 networks:
-    mystocki-network:
-        external: true
+  mystocki-network:
+    external: true
 
 volumes:
-    mystocki_postgres_data:
+  mystocki_postgres_data:
