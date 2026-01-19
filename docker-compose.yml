@@ -1,6 +1,6 @@
 services:
   mystocki-database: 
-    image: postgres:latest 
+    image: postgres:16
     container_name: mystocki-database 
     ports:
       - "5432:${DB_PORT}"
