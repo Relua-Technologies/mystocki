@@ -22,7 +22,8 @@ class OverviewStatsAPIView(View):
             items_null_price = SaleService.get_items_with_null_price(period=period)
             top_products = SaleService.get_top_5_products(period=period)
             top_customers = SaleService.get_top_5_customers(period=period)
-            period_revenue = SaleService.get_period_revenue(period=period)
+            chart_type = request.GET.get('chart_type', 'revenue')
+            period_revenue = SaleService.get_period_chart_data(chart_type=chart_type, period=period)
             
             missing_costs_message = 'Dados de custos incompletos. Algumas movimentações de entrada do período não possuem preço de compra cadastrado.' if not costs_is_reliable else None
             missing_profit_message = 'Dados incompletos para cálculo do lucro. Alguns itens vendidos não possuem informações de preço de compra cadastradas nas movimentações de estoque, tornando o cálculo do lucro impreciso.' if not profit_is_reliable else None

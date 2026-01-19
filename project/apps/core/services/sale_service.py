@@ -243,7 +243,9 @@ class SaleService:
             }
             
             if start_date:
-                filter_kwargs['created__gte'] = start_date
+                from datetime import datetime, time as dt_time
+                start_datetime = datetime.combine(start_date, dt_time.min)
+                filter_kwargs['created__gte'] = start_datetime
             if end_date:
                 from datetime import datetime, time as dt_time
                 end_datetime = datetime.combine(end_date, dt_time.max)
@@ -394,7 +396,7 @@ class SaleService:
     def get_top_5_products(start_date=None, end_date=None, period=None):
         sales = SaleService._get_filtered_sales(start_date, end_date, period)
         top_products = SaleItem.objects.filter(sale__in=sales).values(
-            'item__id', 'item__name'
+            'item__id', 'item__name', 'item__code'
         ).annotate(
             total_quantity=Sum('quantity'),
             total_revenue=Sum((F('item__sale_price') - F('discount')) * F('quantity'))
@@ -404,6 +406,7 @@ class SaleService:
             {
                 'id': p['item__id'],
                 'name': p['item__name'],
+                'code': p['item__code'],
                 'quantity': float(p['total_quantity'] or 0),
                 'revenue': float(p['total_revenue'] or 0)
             }
@@ -436,7 +439,7 @@ class SaleService:
         return result
 
     @staticmethod
-    def get_period_revenue(start_date=None, end_date=None, period=None):
+    def get_period_chart_data(chart_type='revenue', start_date=None, end_date=None, period=None):
         from datetime import timedelta
         from django.db.models.functions import TruncMonth, TruncDay, TruncYear
         
@@ -475,29 +478,153 @@ class SaleService:
         
         labels = []
         values = []
+        
+        weekdays_pt = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo']
+        months_pt = ['', 'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 
+                     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro']
+        
         for sale_data in period_sales:
             if trunc_field in sale_data and sale_data[trunc_field]:
                 if trunc_field == 'day':
                     period_sales_filtered = sales.filter(date=sale_data['day'])
-                    labels.append(sale_data['day'].strftime(date_format))
+                    date_str = sale_data['day'].strftime(date_format)
+                    weekday_index = sale_data['day'].weekday()
+                    weekday_pt = weekdays_pt[weekday_index]
+                    labels.append(f"{date_str}\n({weekday_pt})")
                 elif trunc_field == 'month':
                     period_sales_filtered = sales.filter(
                         date__year=sale_data['month'].year,
                         date__month=sale_data['month'].month
                     )
-                    labels.append(sale_data['month'].strftime(date_format))
+                    month_year = sale_data['month'].strftime(date_format)
+                    month_name = months_pt[sale_data['month'].month]
+                    labels.append(f"{month_year} ({month_name})")
                 elif trunc_field == 'year':
                     period_sales_filtered = sales.filter(date__year=sale_data['year'].year)
                     labels.append(str(sale_data['year'].year))
                 else:
                     period_sales_filtered = sales.none()
                 
-                total = SaleItem.objects.filter(sale__in=period_sales_filtered).aggregate(
-                    total=Sum((F('item__sale_price') - F('discount')) * F('quantity'))
-                )['total']
-                values.append(float(total or 0))
+                if chart_type == 'revenue':
+                    total = SaleItem.objects.filter(sale__in=period_sales_filtered).aggregate(
+                        total=Sum((F('item__sale_price') - F('discount')) * F('quantity'))
+                    )['total']
+                    values.append(float(total or 0))
+                elif chart_type == 'costs':
+                    if trunc_field == 'day':
+                        start_date = sale_data['day']
+                        end_date = sale_data['day']
+                    elif trunc_field == 'month':
+                        from calendar import monthrange
+                        start_date = sale_data['month'].replace(day=1)
+                        last_day = monthrange(sale_data['month'].year, sale_data['month'].month)[1]
+                        end_date = sale_data['month'].replace(day=last_day)
+                    elif trunc_field == 'year':
+                        start_date = sale_data['year'].replace(month=1, day=1)
+                        end_date = sale_data['year'].replace(month=12, day=31)
+                    else:
+                        start_date = None
+                        end_date = None
+                    
+                    costs, _ = SaleService._get_period_purchase_costs(start_date=start_date, end_date=end_date)
+                    values.append(float(costs))
+                elif chart_type == 'profit':
+                    revenue = SaleItem.objects.filter(sale__in=period_sales_filtered).aggregate(
+                        total=Sum((F('item__sale_price') - F('discount')) * F('quantity'))
+                    )['total']
+                    
+                    sale_items = SaleItem.objects.filter(sale__in=period_sales_filtered).select_related('item', 'sale')
+                    
+                    costs = 0.0
+                    items_costs = {}
+                    
+                    for sale_item in sale_items:
+                        item_id = sale_item.item_id
+                        sale_quantity = float(sale_item.quantity) if sale_item.quantity else 0.0
+                        sale_date = sale_item.sale.date if sale_item.sale.date else None
+                        
+                        if sale_date:
+                            cache_key = f"{item_id}_{sale_date}"
+                            if cache_key not in items_costs:
+                                items_costs[cache_key] = SaleService._get_item_average_cost_until_date(item_id, sale_date)
+                            
+                            item_cost = items_costs[cache_key]
+                            if item_cost and item_cost > 0:
+                                costs += float(item_cost) * sale_quantity
+                    
+                    profit = float(revenue or 0) - float(costs)
+                    values.append(profit)
+                elif chart_type == 'sales_count':
+                    count = period_sales_filtered.count()
+                    values.append(count)
+                elif chart_type == 'items_sold':
+                    total = SaleItem.objects.filter(sale__in=period_sales_filtered).aggregate(
+                        total=Sum('quantity')
+                    )['total']
+                    values.append(float(total or 0))
+                else:
+                    values.append(0)
         
         return {'labels': labels, 'values': values}
+    
+    @staticmethod
+    def _get_period_purchase_costs_for_chart(date_filter, trunc_field):
+        try:
+            from datetime import datetime, time as dt_time
+            from calendar import monthrange
+            
+            filter_kwargs = {
+                'movement_type': 'IN',
+                'total_purchase_price__isnull': False,
+                'total_purchase_price__gt': 0
+            }
+            
+            if date_filter:
+                if trunc_field == 'day':
+                    start_datetime = datetime.combine(date_filter, dt_time.min)
+                    end_datetime = datetime.combine(date_filter, dt_time.max)
+                    filter_kwargs['created__gte'] = start_datetime
+                    filter_kwargs['created__lte'] = end_datetime
+                elif trunc_field == 'month':
+                    start_date = date_filter.replace(day=1)
+                    last_day = monthrange(date_filter.year, date_filter.month)[1]
+                    end_date = date_filter.replace(day=last_day)
+                    start_datetime = datetime.combine(start_date, dt_time.min)
+                    end_datetime = datetime.combine(end_date, dt_time.max)
+                    filter_kwargs['created__gte'] = start_datetime
+                    filter_kwargs['created__lte'] = end_datetime
+                elif trunc_field == 'year':
+                    start_date = date_filter.replace(month=1, day=1)
+                    end_date = date_filter.replace(month=12, day=31)
+                    start_datetime = datetime.combine(start_date, dt_time.min)
+                    end_datetime = datetime.combine(end_date, dt_time.max)
+                    filter_kwargs['created__gte'] = start_datetime
+                    filter_kwargs['created__lte'] = end_datetime
+            
+            movements = StockMovement.objects.filter(**filter_kwargs)
+            
+            if not movements.exists():
+                return 0.0, True
+            
+            total_cost = 0.0
+            total_movements = 0
+            movements_with_cost = 0
+            
+            for movement in movements:
+                total_movements += 1
+                if movement.total_purchase_price is not None and movement.total_purchase_price > 0:
+                    movements_with_cost += 1
+                    total_cost += float(movement.total_purchase_price)
+            
+            is_reliable = total_movements > 0 and movements_with_cost == total_movements
+            
+            return float(total_cost), is_reliable
+        except Exception:
+            return 0.0, False
+    
+    @staticmethod
+    def get_period_revenue(start_date=None, end_date=None, period=None):
+        return SaleService.get_period_chart_data('revenue', start_date, end_date, period)
 
     @staticmethod
     def get_yearly_revenue():

@@ -3,7 +3,8 @@
 
     const Dashboard = {
         apiUrl: null,
-        currentPeriod: 'last_month',
+        currentPeriod: 'this_month',
+        currentChartType: 'revenue',
         
         charts: {
             monthly: null
@@ -17,18 +18,65 @@
         },
         
         chartTitles: {
-            'today': 'Faturamento Diário',
-            'this_week': 'Faturamento Semanal',
-            'this_month': 'Faturamento Mensal',
-            'this_year': 'Faturamento Anual'
+            'revenue': {
+                'today': 'Faturamento Diário',
+                'this_week': 'Faturamento Semanal',
+                'this_month': 'Faturamento Mensal',
+                'this_year': 'Faturamento Anual'
+            },
+            'costs': {
+                'today': 'Custos Diários',
+                'this_week': 'Custos Semanais',
+                'this_month': 'Custos Mensais',
+                'this_year': 'Custos Anuais'
+            },
+            'profit': {
+                'today': 'Lucro Diário',
+                'this_week': 'Lucro Semanal',
+                'this_month': 'Lucro Mensal',
+                'this_year': 'Lucro Anual'
+            },
+            'sales_count': {
+                'today': 'Vendas Diárias',
+                'this_week': 'Vendas Semanais',
+                'this_month': 'Vendas Mensais',
+                'this_year': 'Vendas Anuais'
+            },
+            'items_sold': {
+                'today': 'Itens Vendidos Diários',
+                'this_week': 'Itens Vendidos Semanais',
+                'this_month': 'Itens Vendidos Mensais',
+                'this_year': 'Itens Vendidos Anuais'
+            }
         },
         
         init: function() {
             this.apiUrl = $('#dashboard-api-url').data('url');
             this.currentPeriod = $('#period-select').val() || 'this_month';
+            this.currentChartType = 'revenue';
             this.setupPeriodFilter();
+            this.setupStatCards();
+            this.setChartType('revenue');
             this.loadData();
             this.setupTabs();
+        },
+        
+        setupStatCards: function() {
+            const self = this;
+            
+            $('.stat-card').on('click', function() {
+                const chartType = $(this).data('chart-type');
+                self.setChartType(chartType);
+            });
+        },
+        
+        setChartType: function(chartType) {
+            this.currentChartType = chartType;
+            $('.stat-card').removeClass('bg-blue-100 dark:bg-blue-900 border-blue-500').addClass('bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700');
+            $('.stat-card[data-chart-type="' + chartType + '"]').removeClass('bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700').addClass('bg-blue-100 dark:bg-blue-900 border-blue-500');
+            if (this.currentPeriod) {
+                this.loadChartData();
+            }
         },
         
         setupTabs: function() {
@@ -41,6 +89,28 @@
                 const period = $(this).val();
                 self.currentPeriod = period;
                 self.loadData();
+                self.loadChartData();
+            });
+        },
+        
+        loadChartData: function() {
+            const self = this;
+            
+            $.ajax({
+                url: this.apiUrl,
+                method: 'GET',
+                dataType: 'json',
+                data: {
+                    period: this.currentPeriod,
+                    chart_type: this.currentChartType
+                },
+                success: function(data) {
+                    self.updateCharts(data);
+                    self.updateChartTitle(data.period);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading chart data:', error);
+                }
             });
         },
         
@@ -54,7 +124,8 @@
                 method: 'GET',
                 dataType: 'json',
                 data: {
-                    period: this.currentPeriod
+                    period: this.currentPeriod,
+                    chart_type: this.currentChartType
                 },
                 success: function(data) {
                     self.updateStats(data);
@@ -106,7 +177,8 @@
         },
         
         updateChartTitle: function(period) {
-            const title = this.chartTitles[period] || 'Faturamento Mensal';
+            const chartTypeTitles = this.chartTitles[this.currentChartType] || this.chartTitles['revenue'];
+            const title = chartTypeTitles[period] || chartTypeTitles['this_month'] || 'Faturamento Mensal';
             $('#chart-title').text(title);
         },
         
@@ -122,7 +194,21 @@
             const textColor = isDarkMode ? '#9ca3af' : '#6b7280';
             const gridColor = isDarkMode ? '#374151' : '#e5e7eb';
             
-            const chartTitle = this.chartTitles[this.currentPeriod] || 'Faturamento Mensal';
+            const chartTypeTitles = this.chartTitles[this.currentChartType] || this.chartTitles['revenue'];
+            const chartTitle = chartTypeTitles[this.currentPeriod] || chartTypeTitles['this_month'] || 'Faturamento Mensal';
+            
+            const isMoneyChart = this.currentChartType === 'revenue' || this.currentChartType === 'costs' || this.currentChartType === 'profit';
+            
+            let yaxisTitle = 'Faturamento (R$)';
+            if (this.currentChartType === 'costs') {
+                yaxisTitle = 'Custos (R$)';
+            } else if (this.currentChartType === 'profit') {
+                yaxisTitle = 'Lucro (R$)';
+            } else if (this.currentChartType === 'sales_count') {
+                yaxisTitle = 'Número de Vendas';
+            } else if (this.currentChartType === 'items_sold') {
+                yaxisTitle = 'Quantidade de Itens';
+            }
             
             const options = {
                 series: [{
@@ -167,7 +253,7 @@
                 },
                 yaxis: {
                     title: {
-                        text: 'Faturamento (R$)',
+                        text: yaxisTitle,
                         style: {
                             color: textColor,
                             fontSize: '12px'
@@ -177,6 +263,16 @@
                         style: {
                             colors: textColor,
                             fontSize: '12px'
+                        },
+                        formatter: function(val) {
+                            if (isMoneyChart) {
+                                return 'R$ ' + parseFloat(val).toFixed(2).replace('.', ',');
+                            } else {
+                                return parseFloat(val).toLocaleString('pt-BR', {
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0
+                                });
+                            }
                         }
                     }
                 },
@@ -188,7 +284,14 @@
                     theme: isDarkMode ? 'dark' : 'light',
                     y: {
                         formatter: function(val) {
-                            return 'R$ ' + val.toFixed(2);
+                            if (isMoneyChart) {
+                                return 'R$ ' + parseFloat(val).toFixed(2).replace('.', ',');
+                            } else {
+                                return parseFloat(val).toLocaleString('pt-BR', {
+                                    minimumFractionDigits: 0,
+                                    maximumFractionDigits: 0
+                                });
+                            }
                         }
                     }
                 },
@@ -218,7 +321,7 @@
                 left.append($('<div>')
                     .append($('<p>').addClass('font-semibold text-gray-900 dark:text-white').text(product.name))
                     .append($('<p>').addClass('text-sm text-gray-500 dark:text-gray-400')
-                        .text('Quantidade: ' + product.quantity.toLocaleString('pt-BR', {maximumFractionDigits: 2}))));
+                        .text('Código: ' + (product.code || 'N/A') + ' | Quantidade: ' + product.quantity.toLocaleString('pt-BR', {maximumFractionDigits: 2}))));
                 
                 const right = $('<div>').addClass('text-right');
                 right.append($('<p>').addClass('font-semibold text-gray-900 dark:text-white')
