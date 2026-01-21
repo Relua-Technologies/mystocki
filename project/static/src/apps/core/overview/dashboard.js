@@ -217,10 +217,9 @@
                 }],
                 chart: {
                     type: 'bar',
-                    height: chartElement[0].offsetHeight || 300,
+                    height: 300,
                     toolbar: { show: false },
-                    zoom: { enabled: false },
-                    width: '100%'
+                    zoom: { enabled: false }
                 },
                 plotOptions: {
                     bar: {
@@ -315,17 +314,17 @@
             }
             
             products.forEach(function(product, index) {
-                const item = $('<div>').addClass('flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-4 p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700');
+                const item = $('<div>').addClass('flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700');
                 
-                const left = $('<div>').addClass('flex items-start sm:items-center gap-2 sm:gap-4 flex-1 min-w-0');
-                left.append($('<span>').addClass('text-gray-500 dark:text-gray-400 font-medium text-sm sm:text-base flex-shrink-0').text('#' + (index + 1)));
-                left.append($('<div>').addClass('min-w-0 flex-1')
-                    .append($('<p>').addClass('font-semibold text-gray-900 dark:text-white text-sm sm:text-base truncate').text(product.name))
-                    .append($('<p>').addClass('text-xs sm:text-sm text-gray-500 dark:text-gray-400')
+                const left = $('<div>').addClass('flex items-center gap-4');
+                left.append($('<span>').addClass('text-gray-500 dark:text-gray-400 font-medium').text('#' + (index + 1)));
+                left.append($('<div>')
+                    .append($('<p>').addClass('font-semibold text-gray-900 dark:text-white').text(product.name))
+                    .append($('<p>').addClass('text-sm text-gray-500 dark:text-gray-400')
                         .text('Código: ' + (product.code || 'N/A') + ' | Quantidade: ' + product.quantity.toLocaleString('pt-BR', {maximumFractionDigits: 2}))));
                 
-                const right = $('<div>').addClass('text-left sm:text-right flex-shrink-0');
-                right.append($('<p>').addClass('font-semibold text-gray-900 dark:text-white text-sm sm:text-base')
+                const right = $('<div>').addClass('text-right');
+                right.append($('<p>').addClass('font-semibold text-gray-900 dark:text-white')
                     .text(Dashboard.formatCurrency(product.revenue)));
                 
                 item.append(left).append(right);
